@@ -1,0 +1,49 @@
+extends layout
+
+block content
+  h1= title
+  p Блог школы математики и информатики
+  .container
+  .row
+    .col-3
+     .alert.alert-info
+      h2.text-center Поиск
+
+      br
+      .dropdown
+        button#dropdownMenuButton.btn.btn-secondary.dropdown-toggle.btn-block(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+          | По предмету
+        .dropdown-menu(aria-labelledby='dropdownMenuButton')
+         each subject in subjects
+          p.dropdown-item(onclick="handleSubject(" + subject.idSubject + ")") #{subject.name}
+
+      br
+      .dropdown
+        button#dropdownMenuButton.btn.btn-secondary.dropdown-toggle.btn-block(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+          | По темемам
+        .dropdown-menu#themes(aria-labelledby='dropdownMenuButton')
+
+      br
+      input.form-control(type='text', aria-label='Sizing example input', aria-describedby='inputGroup-sizing-default', placeholder="По статьи")
+
+      br
+      input.form-control(type='text', aria-label='Sizing example input', aria-describedby='inputGroup-sizing-default', placeholder="По автору")
+    .col
+      .alert.alert-info
+
+
+
+  script(type='text/javascript').
+   var handleSubject = function(id){
+    console.log(id);
+    $(document).ready(function(){
+      $.ajax({url: "/filter", type: "POST", data: {'subject': id}, success: function(themes){
+        console.log(themes.length);
+        $('#themes').empty();
+        for(var i=0; i<themes.themes.length;i++)
+        {
+          $('#themes').append("<p class='dropdown-item'>" + themes.themes[i].name + "</p>");
+        }
+      }});
+    });
+   }

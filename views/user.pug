@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  h1.text-center.text=title
+  .container
+    .row
+      .col-3
+        .alert.alert-info
+          .container
+            .row
+              .col-3
+               p Имя
+              .col-3
+
+              .col-3
+                button.btn.btn-primary(type='submit') Изменить
+          br
+          input.form-control(type='text', placeholder='urlVK', aria-label='urlVK', aria-describedby='addon-wrapping')
+          br
+          input.form-control(type='text', placeholder='urlFacebook', aria-label='urlFacebook', aria-describedby='addon-wrapping')
+          br
+          button.btn.btn-primary(type='submit') Сохранить
+      .col-9
+       .alert.alert-info
+        p Пароль
+        input.form-control(type='text', placeholder='password', aria-label='password', aria-describedby='addon-wrapping')
+        p Повторите пароль
+        input.form-control(type='text', placeholder='password', aria-label='password', aria-describedby='addon-wrapping')

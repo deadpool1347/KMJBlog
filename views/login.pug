@@ -1,0 +1,23 @@
+extends layout
+
+block content
+
+   .container
+    .row
+     .col-2
+     .col-9
+      .alert.alert-info
+        form
+          .form-group
+            h1= title
+            label(for='exampleInputEmail1') Email address
+            input#exampleInputEmail1.form-control(type='email', aria-describedby='emailHelp', placeholder='Введите email')
+            small#emailHelp.form-text.text-muted Мы никогда не передадим вашу электронную почту кому-либо еще.
+          .form-group
+            label(for='exampleInputPassword1') Password
+            input#exampleInputPassword1.form-control(type='password', placeholder='Введите пароль')
+            small#emailHelp.form-text.text-muted Пароль должен быть от 8-16 символов.
+          .form-group.form-check
+            input#exampleCheck1.form-check-input(type='checkbox')
+            label.form-check-label(for='exampleCheck1') Запомнить меня
+            button.btn.btn-primary(type='submit') Отправить
