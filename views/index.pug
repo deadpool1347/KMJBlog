@@ -10,39 +10,48 @@ block content
       h2.text-center Поиск
 
       br
-      .dropdown
-        button#dropdownMenuButton.btn.btn-secondary.dropdown-toggle.btn-block(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-          | По предмету
-        .dropdown-menu(aria-labelledby='dropdownMenuButton')
-         each subject in subjects
-          p.dropdown-item(onclick="handleSubject(" + subject.idSubject + ")") #{subject.name}
+      form(name="filter", action="/", method="get", enctype="application/x-www-form-urlencoded")
+        select#subject.custom-select.mr-sm-2(name="subject", onchange="handleSubject()")
+          option(value='') По предмету
+          each subject in subjects
+            option(value=subject.idSubject, selected=query && query.subject==subject.idSubject) #{subject.name}
 
-      br
-      .dropdown
-        button#dropdownMenuButton.btn.btn-secondary.dropdown-toggle.btn-block(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-          | По темемам
-        .dropdown-menu#themes(aria-labelledby='dropdownMenuButton')
+        br
+        br
+        select#theme.custom-select.mr-sm-2(value=query ? query.theme : '', name="theme")
+          option(value='') По темам
 
-      br
-      input.form-control(type='text', aria-label='Sizing example input', aria-describedby='inputGroup-sizing-default', placeholder="По статьи")
+        br
+        br
+        input.form-control(value=query ? query.article : '', name="article", type='text', aria-label='Sizing example input', aria-describedby='inputGroup-sizing-default', placeholder="По статьи")
 
-      br
-      input.form-control(type='text', aria-label='Sizing example input', aria-describedby='inputGroup-sizing-default', placeholder="По автору")
-    .col
+        br
+        input.form-control(name="author", type='text', aria-label='Sizing example input', value=query ? query.author : '', aria-describedby='inputGroup-sizing-default', placeholder="По автору")
+        br
+        button.btn.btn-primary(type='submit') Применить
+    .col-9
       .alert.alert-info
+        each article in articles
+          .card
+            .card-body
+               h5.card-title #{article.name}
+               p.card-text #{article.content}
+               a.btn.btn-primary(href='/articles/'+article.idArticle) Подробнее
+          br
+
 
 
 
   script(type='text/javascript').
-   var handleSubject = function(id){
-    console.log(id);
+   var handleSubject = function(){
+    var e = document.getElementById("subject");
+    var id = e.options[e.selectedIndex].value;
     $(document).ready(function(){
       $.ajax({url: "/filter", type: "POST", data: {'subject': id}, success: function(themes){
-        console.log(themes.length);
-        $('#themes').empty();
+        $('#theme').empty();
         for(var i=0; i<themes.themes.length;i++)
         {
-          $('#themes').append("<p class='dropdown-item'>" + themes.themes[i].name + "</p>");
+          $('#theme').append("<option value=" + themes.themes[i].idTheme + " selected="+query && query.theme==themes.themes[i].idTheme+">" + themes.themes[i].name + "</p>");
         }
       }});
     });

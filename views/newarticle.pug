@@ -1,0 +1,34 @@
+extends layout
+
+block content
+  h1= title
+  .alert.alert-info
+
+   br
+   p Название статьи
+   input.form-control(type='text', placeholder='Articlename', aria-label='Articlename', aria-describedby='addon-wrapping')
+
+   br
+   p Содержимое
+   textarea#exampleFormControlTextarea1.form-control(rows='15', aria-label='Content')
+   form
+     .form-row.align-items-center
+       .col-auto
+         .input-group.mb-2
+           .input-group-prepend
+             .input-group-text #
+           input#inlineFormInputGroup.form-control(type='text', placeholder='urlVK')
+       .col-auto
+         .input-group.mb-2
+           .input-group-prepend
+             .input-group-text #
+           input#inlineFormInputGroup.form-control(type='text', placeholder='urlFacebook')
+       .col-auto
+         .form-check.mb-2
+           input#autoSizingCheck.form-check-input(type='checkbox')
+           label.form-check-label(for='autoSizingCheck')
+             | Запомнить меня
+
+       .custom-file
+        input#customFile.custom-file-input(type='file')
+        label.custom-file-label(for='customFile') Выбирите картинку...

@@ -15,16 +15,54 @@ router.get('/', function(req, res, next) {
   connection.query(
     'SELECT * FROM Subject',
     function(err, subjects) {
-      res.render('index', { title: 'KMJ School', subjects: subjects});
+      var where = '';
+      var join = '';
+      if (req.query.theme) {
+        where += `${!where ? 'where':' and'} idTheme=${req.query.theme}`
+      }
+
+      if(req.query.article){
+        where += `${!where ? 'where':' and'} name like "%${req.query.article}%"`
+      }
+
+      if(req.query.author){
+        where += `${!where ? 'where':' and'} login like "%${req.query.author}%"`
+        join+= ` inner join User on Article.idUser=User.idUser`
+      }
+
+      connection.query(
+        `SELECT * FROM Article ${join} ${where}` ,
+        function(err, articles) {
+          res.render('index', {title: 'KMJ School', articles: articles, query:req.query, subjects: subjects});
+        }
+      );
     }
   );
 });
 
-router.get('/article', function(req, res, next) {
+router.get('/newarticles', function(req, res, next) {
   connection.query(
     'SELECT * FROM Users',
     function(err, users) {
-      res.render('article', { title: 'Статья', user: users});
+      res.render('newarticle', { title: 'Статья', user: users});
+    }
+  );
+});
+
+router.get('/articles/:id', function(req, res, next) {
+  connection.query(
+    'SELECT * FROM Article where idArticle='+req.params.id,
+    function(err, article) {
+      res.render('article', {article: article[0]});
+    }
+  );
+});
+
+router.get('/registration', function(req, res, next) {
+  connection.query(
+    'SELECT * FROM Users',
+    function(err, articles) {
+      res.render('registration', { title: 'Регистрация', articles: articles});
     }
   );
 });
@@ -48,8 +86,6 @@ router.get('/user', function(req, res, next) {
 });
 
 router.post('/filter', function(req, res, next) {
-
-  console.log(req.body);
   connection.query(
     'SELECT * FROM Theme where idSubject = ' + req.body.subject,
     function(err, themes) {
@@ -57,6 +93,7 @@ router.post('/filter', function(req, res, next) {
     }
   );
 });
+
 
 
 module.exports = router;
