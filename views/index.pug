@@ -20,7 +20,7 @@ block content
         br
         select#theme.custom-select.mr-sm-2(value=query ? query.theme : '', name="theme")
           option(value='') По темам
-
+        - console.log(session);
         br
         br
         input.form-control(value=query ? query.article : '', name="article", type='text', aria-label='Sizing example input', aria-describedby='inputGroup-sizing-default', placeholder="По статьи")
@@ -38,7 +38,7 @@ block content
                p.card-text #{article.content}
                a.btn.btn-primary(href='/articles/'+article.idArticle) Подробнее
           br
-
+    p #{session.email}
 
 
 

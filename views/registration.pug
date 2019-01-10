@@ -1,18 +1,29 @@
 extends layout
 
 block content
-  h1= title
-  .alert.alert-info
-    form
-      .form-group.row
-        label.col-sm-2.col-form-label(for='inputEmail3') Email
-        .col-sm-10
-          input#inputEmail3.form-control(type='email', placeholder='Email')
-      .form-group.row
-        label.col-sm-2.col-form-label(for='inputPassword3') Password
-        .col-sm-10
-          input#inputPassword3.form-control(type='password', placeholder='Password')
-    
-      .form-group.row
-        .col-sm-10
-          button.btn.btn-primary(type='submit') Sign in
+  .container
+    .row
+      .col-6
+       .alert.alert-info
+        .col-12
+          h1 Регистрация
+          if error
+            .alert.alert-danger(role='alert') #{error}
+          form(name="registration", action="/registration", method="get", enctype="application/x-www-form-urlencoded")
+            .form-group.row
+              label.col-sm-2.col-form-label(for='inputEmail3') Email
+              .col-sm-10
+                input#inputEmail3.form-control(name="email", type='email', placeholder='Email', value=query ? query.email : '')
+            .form-group.row
+              label.col-sm-2.col-form-label(for='inputPassword3') Пароль
+              .col-sm-10
+                input.form-control(name="password1", type='password', placeholder='Пароль',  value=query ? query.password1 : '')
+            .form-group.row
+              label.col-sm-2.col-form-label(for='inputPassword3') Повторите пароль
+              .col-sm-10
+                input.form-control(name="password2", type='password', placeholder='Повторите пароль',  value=query ? query.password2 : '')
+            p Уже есть аккаунт? &nbsp
+             a(href="/login") Войти
+            .form-group.row
+              .col-sm-10
+                button.btn.btn-primary(type='submit') Зарегистрироваться
