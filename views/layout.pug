@@ -16,26 +16,26 @@ html
       #navbarSupportedContent.collapse.navbar-collapse
         ul.navbar-nav.mr-auto
           li.nav-item.active
-            a.nav-link(href='#')
-              | Статья
+            a.nav-link(href='/articles')
+              | Статьи
               span.sr-only (current)
           li.nav-item
             a.nav-link(href='/user') Личный кабинет
-          li.nav-item.dropdown
-            a#navbarDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-              | Dropdown
-            .dropdown-menu(aria-labelledby='navbarDropdown')
-              a.dropdown-item(href='/articles') Статья
-              a.dropdown-item(href='#') Личный кабинет
-              .dropdown-divider
-              a.dropdown-item(href='#') Настройки
-          li.nav-item
-            a.nav-link.disabled(href='#') Disabled
-        form.form-inline.my-2.my-lg-0
-          input.form-control.mr-sm-2(type='search', placeholder='Search', aria-label='Search')
-          button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Поиск
+        
+          if session && session.email
+            span.nav-link #{session.email}
+            form.form-inline.my-2.my-lg-0(name="logout", action="/logout", method="get", enctype="application/x-www-form-urlencoded")
+              button.btn.btn-outline-success(type='submit') Выйти    
+          else 
+            a.btn.btn-outline-success(href="/login") Войти 
+    
+          if session && session.idStatus
+            a.btn.btn-outline-info.btn-newarticles(href="/newarticles") Добавить статью
+
+          
     br
     br
     br
   body
-    block content
+    .container-fluid
+      block content

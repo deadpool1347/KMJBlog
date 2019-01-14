@@ -2,28 +2,30 @@ extends layout
 
 block content
   h1.text-center.text Пользователь
+  br
+  br
   .container
     .row
-      .col-3
+      .col-6
         .alert.alert-info
-          .container
-            .row
-              .col-3
-               p Имя
-              .col-3
-
-              .col-3
-                button.btn.btn-primary(type='submit') Изменить
-          br
-          input.form-control(type='text', placeholder='urlVK', aria-label='urlVK', aria-describedby='addon-wrapping')
-          br
-          input.form-control(type='text', placeholder='urlFacebook', aria-label='urlFacebook', aria-describedby='addon-wrapping')
-          br
-          button.btn.btn-primary(type='submit') Сохранить
-      .col-9
+          form(name="user", action="/user", method="get", enctype="application/x-www-form-urlencoded")
+            label.col-form-label Ник
+            input.form-control(value=user ? user.name : '', name='nickname', type='text', placeholder='Ник', aria-label='nick', aria-describedby='addon-wrapping')
+            br
+            label.col-form-label url Vkontakte
+            input.form-control(value=user ? user.vk : '', name='urlVK', type='text', placeholder='urlVK', aria-label='urlVK', aria-describedby='addon-wrapping')
+            br
+            label.col-form-label url Facebook
+            input.form-control(value=user ? user.facebook : '', name='urlFacebook', type='text', placeholder='urlFacebook', aria-label='urlFacebook', aria-describedby='addon-wrapping')
+            br
+            button.btn.btn-primary(type='submit') Сохранить
+      .col-6
        .alert.alert-info
-        p Пароль
-        input.form-control(type='text', placeholder='password', aria-label='password', aria-describedby='addon-wrapping')
-        br
-        p Повторите пароль
-        input.form-control(type='text', placeholder='password', aria-label='Repeat password', aria-describedby='addon-wrapping')
+         form(name="password", action="/user", method="get", enctype="application/x-www-form-urlencoded")
+          label.col-form-label Пароль
+          input.form-control(name='password1', type='text', placeholder='password', aria-label='password', aria-describedby='addon-wrapping')
+          br
+          label.col-form-label Повторите пароль
+          input.form-control(name='password2', type='text', placeholder='password', aria-label='Repeat password', aria-describedby='addon-wrapping')
+          br
+          button.btn.btn-primary(type='submit') Изменить

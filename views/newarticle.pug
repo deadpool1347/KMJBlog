@@ -1,34 +1,62 @@
 extends layout
 
 block content
-  h1= title
-  .alert.alert-info
+  h1.text-center  Добавление статьи
+  br
+  br
+  - console.log(query);
+  .container
+    .alert.alert-info
+      if error
+        .alert.alert-danger(role='alert') #{error}
+      br
+      form(name="newarticle", action="/newarticles", method="get", enctype="application/x-www-form-urlencoded")
+        select#subject.custom-select.mr-sm-2(name="subject", onchange="handleSubject()")
+          option(value='') Выбирите предмет
+          each subject in subjects
+            option(value=subject.idSubject, selected=query && query.subject==subject.idSubject) #{subject.name}
 
-   br
-   p Название статьи
-   input.form-control(type='text', placeholder='Articlename', aria-label='Articlename', aria-describedby='addon-wrapping')
+        br
+        br
+        select#theme.custom-select.mr-sm-2(value=query ? query.theme : '', name="theme")
+          option(value='') Выбирите тему
+        br
+        br
+        p Название статьи
+        input.form-control(value=query ? query.name : '', name="name", type='text', placeholder='Название статьи', aria-label='Articlename', aria-describedby='addon-wrapping')
+  
+        br
+        p Содержимое
+        textarea.form-control(name='content', rows='15', placeholder='Содержание') #{query ? query.content : ''}
+        br
+        .form-row.align-items-center
+          .col-auto
+            .input-group.mb-2
+              .input-group-prepend
+                .input-group-text #
+              input.form-control(type='text', placeholder='urlVK')
 
-   br
-   p Содержимое
-   textarea#exampleFormControlTextarea1.form-control(rows='15', aria-label='Content')
-   form
-     .form-row.align-items-center
-       .col-auto
-         .input-group.mb-2
-           .input-group-prepend
-             .input-group-text #
-           input#inlineFormInputGroup.form-control(type='text', placeholder='urlVK')
-       .col-auto
-         .input-group.mb-2
-           .input-group-prepend
-             .input-group-text #
-           input#inlineFormInputGroup.form-control(type='text', placeholder='urlFacebook')
-       .col-auto
-         .form-check.mb-2
-           input#autoSizingCheck.form-check-input(type='checkbox')
-           label.form-check-label(for='autoSizingCheck')
-             | Запомнить меня
 
-       .custom-file
-        input#customFile.custom-file-input(type='file')
-        label.custom-file-label(for='customFile') Выбирите картинку...
+        .custom-file
+          input.custom-file-input(type='file')
+          label.custom-file-label(for='customFile') Выбирите картинку...
+        br
+        br
+        button.btn.btn-primary(type='submit') Сохранить
+          
+
+
+  script(type='text/javascript').
+   var handleSubject = function(){
+    var e = document.getElementById("subject");
+    var id = e.options[e.selectedIndex].value;
+    $(document).ready(function(){
+      $.ajax({url: "/filter", type: "POST", data: {'subject': id}, success: function(themes){
+        $('#theme').empty();
+        for(var i=0; i<themes.themes.length;i++)
+        {
+        $('#theme').append("<option value=" + themes.themes[i].idTheme + " >" + themes.themes[i].name + "</p>");
+        }
+      }});
+    });
+   }
