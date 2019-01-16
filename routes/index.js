@@ -243,7 +243,7 @@ router.get('/password', function(req, res, next) {
     res.render('password');
     return;
   }
-console.log(req.query.email);
+
   connection.query(
     'SELECT * FROM User where login="'+req.query.email+'"',
     function(err, user) {
@@ -252,7 +252,6 @@ console.log(req.query.email);
         to: req.query.email,
         subject: 'Восстановление пароля',
       };
-      console.log(user);
       var link ='http://localhost:3000/email-recovery?link='+user[0].key+'&email='+req.query.email;
       res.render('recovery',{link: link}, function (err, html) {
             if (err) {
