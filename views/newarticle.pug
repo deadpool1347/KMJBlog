@@ -9,7 +9,7 @@ block content
       if error
         .alert.alert-danger(role='alert') #{error}
       br
-      form(name="newarticle", action="/newarticles", method="get", enctype="application/x-www-form-urlencoded")
+      form(name="newarticle", action="/newarticles", method="post", enctype="multipart/form-data")
         select#subject.custom-select.mr-sm-2(name="subject", onchange="handleSubject()")
           option(value='') Выбирите предмет
           each subject in subjects
@@ -33,11 +33,12 @@ block content
             .input-group.mb-2
               .input-group-prepend
                 .input-group-text #
-              input.form-control(type='text', placeholder='urlVK')
-
-
+              select.selectpicker(value=query ? query.tag : '', multiple, title='Тэги', name='tag') 
+                each tag in tags
+                  option(value=tag.idTag, selected=query && query.tag==tag.idTag) #{tag.name}
+            
         .custom-file
-          input.custom-file-input(type='file')
+          input.custom-file-input(type='file', name='img')
           label.custom-file-label(for='customFile') Выбирите картинку...
         br
         br

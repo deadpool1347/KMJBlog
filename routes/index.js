@@ -1,10 +1,23 @@
 var express = require('express');
 var router = express.Router();
+var path = require('path');
 var mysql = require ( 'mysql2' ) ;
-var mailgun = require("mailgun-js");
 var api_key = 'key-2f09c76695a377a13554a4f01e97d874';
 var DOMAIN = 'mg.kazakovmj.ru';
 var mailgun = require('mailgun-js')({apiKey: api_key, domain: DOMAIN});
+var multer  = require('multer')
+
+
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../public/images'))
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now()+'.jpg')
+  }
+})
+var upload = multer({ dest: 'uploads/', storage: storage })
 
 
 var connection = mysql . createConnection ( {
@@ -17,9 +30,15 @@ var connection = mysql . createConnection ( {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+
+  req.session.email='fuurria@yandex.ru';
+  req.session.idUser=20;
+  req.session.idStatus=3;
+
   connection.query(
     'SELECT * FROM Subject',
     function(err, subjects) {
+      console.log(subjects)
       var where = '';
       var join = '';
       if (req.query.theme) {
@@ -49,22 +68,58 @@ router.get('/newarticles', function(req, res, next) {
   connection.query(
     'SELECT * FROM Subject',
     function(err, subjects) {
-      if(Object.keys(req.query).length === 0){
-        res.render('newarticle',{subjects: subjects, query: req.query});
-        return;
-      }
-
-      var error;
-
-      if(!req.query.theme || !req.query.name || !req.query.content){
-        error='Заполните все поля!';
-        res.render('newarticle', {query: req.query, error: error, subjects: subjects});
-        return;
-      }
       connection.query(
-        'INSERT INTO `Article`( `name`, `content`, `idUser`, `idTheme`) VALUES ("'+req.query.name+'","'+req.query.content+'",'+req.session.idUser+','+req.query.theme+')',
-        function(err) {
-          res.redirect('/');
+        'SELECT * FROM Tag',
+        function(err, tags) {
+          res.render('newarticle',{subjects: subjects, query: req.query, tags: tags});
+        }
+      );
+    }
+  );
+});
+
+router.post('/newarticles', upload.single('img'), function(req, res, next) {
+  console.log(req.file);
+  console.log(req.body);
+  console.log(req.files);
+  connection.query(
+    'SELECT * FROM Subject',
+    function(err, subjects) {
+      connection.query(
+        'SELECT * FROM Tag',
+        function(err, tags) {
+          if(Object.keys(req.query).length === 0){
+            res.render('newarticle',{subjects: subjects, query: req.query, tags: tags});
+            return;
+          }
+
+          var error;
+
+          if(!req.query.theme || !req.query.name || !req.query.content){
+            error='Заполните все поля!';
+            res.render('newarticle', {query: req.query, error: error, subjects: subjects, tags: tags});
+            return;
+          }
+          connection.query(
+            'INSERT INTO `Article`( `name`, `content`, `idUser`, `idTheme`) VALUES ("'+req.query.name+'","'+req.query.content+'",'+req.session.idUser+','+req.query.theme+')',
+            function(err, article) {
+              var mas;
+              if(typeof req.query.tag=='object'){
+                 mas=req.query.tag.map(tag => {
+                  return [tag, article.insertId]
+                });
+              }
+              else{
+                mas=[[req.query.tag, article.insertId]];
+              }
+              connection.query(
+                'INSERT INTO `TagArticle`(`idTag`, `idArticle`) VALUES ?',[mas],
+                function(err, tags) {
+                  res.redirect('/');
+                }
+              );
+            }
+          );
         }
       );
     }
