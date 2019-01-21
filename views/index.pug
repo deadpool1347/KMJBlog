@@ -15,11 +15,14 @@ block content
           option(value='') По предмету
           each subject in subjects
             option(value=subject.idSubject, selected=query && query.subject==subject.idSubject) #{subject.name}
-
         br
         br
         select#theme.custom-select.mr-sm-2(value=query ? query.theme : '', name="theme")
           option(value='') По темам
+          if themes 
+            each theme in themes
+              option(value=theme.idTheme, selected=query && query.theme==theme.idTheme) #{theme.name}
+          
         br
         br
         input.form-control(value=query ? query.article : '', name="article", type='text', aria-label='Sizing example input', aria-describedby='inputGroup-sizing-default', placeholder="По статьи")
@@ -34,6 +37,7 @@ block content
           .card
             .card-body
                h5.card-title #{article.name}
+               img.rounded(width='100%', src="images/"+ article.img)
                p.card-text #{article.content}
                a.btn.btn-primary(href='/articles/'+article.idArticle) Подробнее
           br
@@ -50,7 +54,7 @@ block content
         $('#theme').empty();
         for(var i=0; i<themes.themes.length;i++)
         {
-          $('#theme').append("<option value=" + themes.themes[i].idTheme + " selected="+query && query.theme==themes.themes[i].idTheme+">" + themes.themes[i].name + "</p>");
+          $('#theme').append("<option value=" + themes.themes[i].idTheme + ">" + themes.themes[i].name + "</option>");
         }
       }});
     });

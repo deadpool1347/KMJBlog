@@ -14,11 +14,13 @@ block content
           option(value='') Выбирите предмет
           each subject in subjects
             option(value=subject.idSubject, selected=query && query.subject==subject.idSubject) #{subject.name}
-
         br
         br
         select#theme.custom-select.mr-sm-2(value=query ? query.theme : '', name="theme")
           option(value='') Выбирите тему
+          if themes 
+            each theme in themes
+              option(value=theme.idTheme, selected=query && query.theme==theme.idTheme) #{theme.name}
         br
         br
         p Название статьи

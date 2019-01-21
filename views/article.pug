@@ -1,9 +1,28 @@
 extends layout
 
 block content
-  h1= article.name
-  .alert.alert-info
-     label(for='exampleInputEmail1') login
-     .text-center
-      img.rounded(src='...', alt='...')
-      p content
+  h1.text-center= article.name
+  br
+  br
+  .container
+    .alert.alert-info
+      .row
+        .col-sm
+          h4 Предмет #{article.subjectName}
+          h4 Тема #{article.themeName}
+        .col-sm
+          h4 Автор #{article.login}
+          h4 Дата: #{article.date}
+      br
+      .text-center
+        img.rounded(width='100%', src='/images/'+article.img, alt='...')
+        br
+        br
+      each tag in tags
+        span ##{tag.name}  
+      br 
+      br
+      p #{article.content}
+      if session.email==article.login
+        .text-center
+           button Редактировать

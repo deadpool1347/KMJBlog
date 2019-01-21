@@ -38,7 +38,6 @@ router.get('/', function(req, res, next) {
   connection.query(
     'SELECT * FROM Subject',
     function(err, subjects) {
-      console.log(subjects)
       var where = '';
       var join = '';
       if (req.query.theme) {
@@ -57,9 +56,28 @@ router.get('/', function(req, res, next) {
       connection.query(
         `SELECT * FROM Article ${join} ${where}` ,
         function(err, articles) {
+          if(req.query.subject){
+            connection.query(
+              'SELECT * FROM Theme where idSubject = ' + req.query.subject,
+              function(err, themes) {
+                res.render('index', {title: 'KMJ School', articles: articles, query:req.query, subjects: subjects, session: req.session, themes: themes});
+              }
+            );
+            return;
+          }
+
           res.render('index', {title: 'KMJ School', articles: articles, query:req.query, subjects: subjects, session: req.session});
         }
       );
+    }
+  );
+});
+
+router.post('/filter', function(req, res, next) {
+  connection.query(
+    'SELECT * FROM Theme where idSubject = ' + req.body.subject,
+    function(err, themes) {
+      res.send({themes: themes});
     }
   );
 });
@@ -79,38 +97,48 @@ router.get('/newarticles', function(req, res, next) {
 });
 
 router.post('/newarticles', upload.single('img'), function(req, res, next) {
-  console.log(req.file);
-  console.log(req.body);
-  console.log(req.files);
   connection.query(
     'SELECT * FROM Subject',
     function(err, subjects) {
       connection.query(
         'SELECT * FROM Tag',
         function(err, tags) {
-          if(Object.keys(req.query).length === 0){
-            res.render('newarticle',{subjects: subjects, query: req.query, tags: tags});
+          if(Object.keys(req.body).length === 0){
+            res.render('newarticle',{subjects: subjects, query: req.body, tags: tags});
             return;
           }
 
           var error;
 
-          if(!req.query.theme || !req.query.name || !req.query.content){
-            error='Заполните все поля!';
-            res.render('newarticle', {query: req.query, error: error, subjects: subjects, tags: tags});
+
+          if(req.body.theme && (!req.body.name || !req.body.content)){
+            connection.query(
+              'SELECT * FROM Theme where idSubject = ' + req.body.subject,
+              function(err, themes) {
+                error='Заполните все поля!';
+                res.render('newarticle', {query: req.body, error: error, subjects: subjects, tags: tags, themes: themes});
+              }
+            );
             return;
           }
+
+          if(!req.body.theme || !req.body.name || !req.body.content){
+            error='Заполните все поля!';
+            res.render('newarticle', {query: req.body, error: error, subjects: subjects, tags: tags});
+            return;
+          }
+
           connection.query(
-            'INSERT INTO `Article`( `name`, `content`, `idUser`, `idTheme`) VALUES ("'+req.query.name+'","'+req.query.content+'",'+req.session.idUser+','+req.query.theme+')',
+            'INSERT INTO `Article`( `name`, `content`, `idUser`, `idTheme`, `img`) VALUES ("'+req.body.name+'","'+req.body.content+'",'+req.session.idUser+','+req.body.theme+', "'+req.file.filename+'")',
             function(err, article) {
               var mas;
-              if(typeof req.query.tag=='object'){
-                 mas=req.query.tag.map(tag => {
+              if(typeof req.body.tag=='object'){
+                 mas=req.body.tag.map(tag => {
                   return [tag, article.insertId]
                 });
               }
               else{
-                mas=[[req.query.tag, article.insertId]];
+                mas=[[req.body.tag, article.insertId]];
               }
               connection.query(
                 'INSERT INTO `TagArticle`(`idTag`, `idArticle`) VALUES ?',[mas],
@@ -127,10 +155,26 @@ router.post('/newarticles', upload.single('img'), function(req, res, next) {
 });
 
 router.get('/articles/:id', function(req, res, next) {
+  console.log(req.params);
   connection.query(
-    'SELECT * FROM Article where idArticle='+req.params.id,
+    `SELECT Article.idArticle, Article.name, content, Article.date, Article.img, User.login, Theme.name as themeName, Subject.name as subjectName FROM Article
+inner join User on User.idUser=Article.idUser
+inner join Theme on Theme.idTheme=Article.idTheme
+inner join Subject on Theme.idSubject=Subject.idSubject
+where idArticle=`+req.params.id,
     function(err, article) {
-      res.render('article', {article: article[0]});
+
+      connection.query(
+        `SELECT name FROM TagArticle
+inner join Tag on TagArticle.idTag=Tag.idTag
+where TagArticle.idArticle=`+req.params.id,
+        function(err, tags) {
+          console.log(tags);
+          res.render('article', {article: article[0], tags: tags});
+        }
+      );
+
+
     }
   );
 });
@@ -339,14 +383,7 @@ router.get('/email-recovery', function(req, res, next) {
   );
 });
 
-router.post('/filter', function(req, res, next) {
-  connection.query(
-    'SELECT * FROM Theme where idSubject = ' + req.body.subject,
-    function(err, themes) {
-      res.send({themes: themes});
-    }
-  );
-});
+
 
 
 
