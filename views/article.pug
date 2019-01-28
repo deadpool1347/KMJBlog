@@ -23,6 +23,22 @@ block content
       br 
       br
       p #{article.content}
+      br
       if session.email==article.login
         .text-center
-           button Редактировать
+           a.btn.btn-info(href='/newarticles/'+article.idArticle) Редактировать
+    .alert.alert-info
+      each comment in comments
+        .row
+          .col-sm
+            h4  #{comment.login}
+            h4 #{comment.date}
+          .col-sm
+            p  #{comment.content}
+        hr
+      form(name="comment", action="/articles/"+article.idArticle, method="get", enctype="application/x-www-form-urlencoded")
+          textarea.form-control(name='comment', rows='15', placeholder='Комментарий')
+          br
+          button.btn.btn-primary(type='submit') Отправить
+
+          

@@ -23,7 +23,9 @@ block content
        .alert.alert-info
          form(name="password", action="/user", method="get", enctype="application/x-www-form-urlencoded")
           label.col-form-label Пароль
-          input.form-control(name='password1', type='text', placeholder='password', aria-label='password', aria-describedby='addon-wrapping')
+          span.input-group-addon
+            span.glyphicon.glyphicon-lock(style='float:right;') &nbsp
+            input.form-control(name='password1', type='text', placeholder='password', aria-label='password', aria-describedby='addon-wrapping')
           br
           label.col-form-label Повторите пароль
           input.form-control(name='password2', type='text', placeholder='password', aria-label='Repeat password', aria-describedby='addon-wrapping')

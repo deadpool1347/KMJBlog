@@ -1,7 +1,9 @@
 extends layout
 
 block content
-  h1.text-center  Добавление статьи
+
+  h1.text-center= title
+
   br
   br
   .container
@@ -9,18 +11,19 @@ block content
       if error
         .alert.alert-danger(role='alert') #{error}
       br
-      form(name="newarticle", action="/newarticles", method="post", enctype="multipart/form-data")
-        select#subject.custom-select.mr-sm-2(name="subject", onchange="handleSubject()")
+      form(name="newarticle", action="/newarticles/"+query ? query.idArticle , method="post", enctype="multipart/form-data")
+        select#subject.custom-select.mr-sm-2(name="idSubject", onchange="handleSubject()")
           option(value='') Выбирите предмет
           each subject in subjects
-            option(value=subject.idSubject, selected=query && query.subject==subject.idSubject) #{subject.name}
+            option(value=subject.idSubject, selected=query && query.idSubject==subject.idSubject) #{subject.name}
         br
         br
-        select#theme.custom-select.mr-sm-2(value=query ? query.theme : '', name="theme")
+        - console.log(tags) 
+        select#theme.custom-select.mr-sm-2(value=query ? query.idTheme : '', name="idTheme")
           option(value='') Выбирите тему
           if themes 
             each theme in themes
-              option(value=theme.idTheme, selected=query && query.theme==theme.idTheme) #{theme.name}
+              option(value=theme.idTheme, selected=query && query.idTheme==theme.idTheme) #{theme.name}
         br
         br
         p Название статьи
@@ -35,9 +38,9 @@ block content
             .input-group.mb-2
               .input-group-prepend
                 .input-group-text #
-              select.selectpicker(value=query ? query.tag : '', multiple, title='Тэги', name='tag') 
+              select.selectpicker(value=query ? query.tags : '', multiple, title='Тэги', name='tags') 
                 each tag in tags
-                  option(value=tag.idTag, selected=query && query.tag==tag.idTag) #{tag.name}
+                  option(value=tag.idTag, selected=query && query.tags && query.tags.indexOf(tag.idTag) !== -1) #{tag.name}
             
         .custom-file
           input.custom-file-input(type='file', name='img')

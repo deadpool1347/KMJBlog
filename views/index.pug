@@ -40,10 +40,14 @@ block content
                img.rounded(width='100%', src="images/"+ article.img)
                p.card-text #{article.content}
                a.btn.btn-primary(href='/articles/'+article.idArticle) Подробнее
-          br
-
-
-
+               br
+               br
+                 
+                 
+               span.oi.oi-thumb-up(id='like'+article.idArticle, class='glyphicon glyphicon-thumbs-up ', style='font-size: 200%; margin-right: 20px;' onclick='handleLike(this, 1,'+article.idArticle+')') #{article.likes || 0}
+               span.oi.oi-thumb-down(id='dislike'+article.idArticle, class='glyphicon glyphicon-thumbs-down ', style='font-size: 200%' onclick='handleLike(this, 0,'+article.idArticle+')') #{article.dislikes || 0}
+          
+          br 
 
   script(type='text/javascript').
    var handleSubject = function(){
@@ -59,3 +63,25 @@ block content
       }});
     });
    }
+   
+  script(type='text/javascript').
+    var handleLike = function(e, like,idArticle){
+    
+     $(document).ready(function(){
+       $.ajax({url: "/like", type: "POST", data: {like: like, idArticle: idArticle}, success: function(res){
+        if(res.Status==1){
+          e.innerText=  parseInt(e.innerText)+1;
+        }
+        else if(res.Status==2){
+          e.innerText=  parseInt(e.innerText)+1;
+          var other = document.getElementById(e.id=='like'+idArticle ? 'dislike'+idArticle : 'like'+idArticle);
+          other.innerText=  parseInt(other.innerText)-1;
+        }
+      
+       }});
+     });
+    }
+    
+    
+    
+    

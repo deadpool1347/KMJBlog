@@ -39,7 +39,7 @@ router.get('/', function(req, res, next) {
     'SELECT * FROM Subject',
     function(err, subjects) {
       var where = '';
-      var join = '';
+      var join = 'left join ArticleLike on ArticleLike.idArticle=Article.idArticle';
       if (req.query.theme) {
         where += `${!where ? 'where':' and'} idTheme=${req.query.theme}`
       }
@@ -54,21 +54,62 @@ router.get('/', function(req, res, next) {
       }
 
       connection.query(
-        `SELECT * FROM Article ${join} ${where}` ,
+        `SELECT Article.idArticle, name, content, date, img,
+        sum(case when likes=1 then 1 end) as likes,
+        sum(case when likes=0 then 1 end) as dislikes
+        FROM Article ${join} ${where}
+        GROUP by Article.idArticle` ,
         function(err, articles) {
+          var newArticlas = articles.map(article => {
+            return { ...article, content: article.content.slice(0, 400)+'...' }
+          })
+
           if(req.query.subject){
             connection.query(
               'SELECT * FROM Theme where idSubject = ' + req.query.subject,
               function(err, themes) {
-                res.render('index', {title: 'KMJ School', articles: articles, query:req.query, subjects: subjects, session: req.session, themes: themes});
+                res.render('index', {title: 'KMJ School', articles: newArticlas, query:req.query, subjects: subjects, session: req.session, themes: themes});
               }
             );
             return;
           }
 
-          res.render('index', {title: 'KMJ School', articles: articles, query:req.query, subjects: subjects, session: req.session});
+          res.render('index', {title: 'KMJ School', articles: newArticlas, query:req.query, subjects: subjects, session: req.session});
         }
       );
+    }
+  );
+});
+
+router.post('/like', function(req, res, next) {
+  connection.query(
+    'SELECT * FROM ArticleLike where idUser = ' + req.session.idUser+' and idArticle='+req.body.idArticle,
+    function(err, like) {
+
+
+      if(like[0]){
+
+        if(like[0].like==req.body.like){
+            res.send({Status: 0});
+        }
+        else {
+          connection.query(
+            'UPDATE ArticleLike SET likes='+req.body.like+' WHERE idArticleLike=' + like[0].idArticleLike,
+            function(err, themes) {
+              res.send({Status: 2});
+            }
+          );
+        }
+          return;
+      }
+
+      connection.query(
+        'INSERT INTO ArticleLike(idArticle, likes, idUser) VALUES ('+req.body.idArticle+','+req.body.like+','+req.session.idUser+')',
+        function(err, themes) {
+          res.send({Status: 1});
+        }
+      );
+
     }
   );
 });
@@ -82,21 +123,59 @@ router.post('/filter', function(req, res, next) {
   );
 });
 
-router.get('/newarticles', function(req, res, next) {
+router.get('/newarticles/:id', function(req, res, next) {
   connection.query(
     'SELECT * FROM Subject',
     function(err, subjects) {
       connection.query(
         'SELECT * FROM Tag',
         function(err, tags) {
-          res.render('newarticle',{subjects: subjects, query: req.query, tags: tags});
+          if(req.params.id !== '0'){
+            connection.query(
+              `SELECT Article.idArticle, Article.name, content, Article.date, Article.img, idSubject, Article.idTheme  FROM Article
+inner join Theme on Theme.idTheme=Article.idTheme
+where idArticle=`+req.params.id,
+              function(err, article) {
+                connection.query(
+                  'SELECT * FROM TagArticle where idArticle = ' + article[0].idArticle,
+                  function(err, tagArticle) {
+                    var newtags = tagArticle.map(tag =>{
+                      return tag.idTag
+                    })
+                    connection.query(
+                      'SELECT * FROM Theme where idSubject = ' + article[0].idSubject,
+                      function(err, themes) {
+                        res.render('newarticle',{title: 'Изменение статьи', subjects: subjects, query: { ...article[0], tags: newtags }, tags: tags, themes: themes});
+                      }
+                    );
+                  }
+                );
+              }
+            );
+            return;
+          }
+
+          res.render('newarticle',{title: 'Добавление статьи', subjects: subjects, query: req.query, tags: tags});
         }
       );
     }
   );
 });
 
-router.post('/newarticles', upload.single('img'), function(req, res, next) {
+router.post('/newarticles/:id', upload.single('img'), function(req, res, next) {
+
+  if(req.params.id!=='0'){
+    connection.query(
+      'UPDATE Article SET name="'+req.body.name+'", content="'+req.body.content+'",idTheme='+req.body.idTheme+', img="'+req.body.img+'" WHERE idArticle=' + req.params.id,
+      function(err, themes) {
+        res.redirect('/');
+      }
+    );
+    return;
+  }
+
+
+
   connection.query(
     'SELECT * FROM Subject',
     function(err, subjects) {
@@ -111,9 +190,9 @@ router.post('/newarticles', upload.single('img'), function(req, res, next) {
           var error;
 
 
-          if(req.body.theme && (!req.body.name || !req.body.content)){
+          if(req.body.idTheme && (!req.body.name || !req.body.content)){
             connection.query(
-              'SELECT * FROM Theme where idSubject = ' + req.body.subject,
+              'SELECT * FROM Theme where idSubject = ' + req.body.idSubject,
               function(err, themes) {
                 error='Заполните все поля!';
                 res.render('newarticle', {query: req.body, error: error, subjects: subjects, tags: tags, themes: themes});
@@ -122,23 +201,23 @@ router.post('/newarticles', upload.single('img'), function(req, res, next) {
             return;
           }
 
-          if(!req.body.theme || !req.body.name || !req.body.content){
+          if(!req.body.idTheme || !req.body.name || !req.body.content){
             error='Заполните все поля!';
             res.render('newarticle', {query: req.body, error: error, subjects: subjects, tags: tags});
             return;
           }
 
           connection.query(
-            'INSERT INTO `Article`( `name`, `content`, `idUser`, `idTheme`, `img`) VALUES ("'+req.body.name+'","'+req.body.content+'",'+req.session.idUser+','+req.body.theme+', "'+req.file.filename+'")',
+            'INSERT INTO `Article`( `name`, `content`, `idUser`, `idTheme`, `img`) VALUES ("'+req.body.name+'","'+req.body.content+'",'+req.session.idUser+','+req.body.idTheme+', "'+(req.file ? req.file.filename : '')+'")',
             function(err, article) {
               var mas;
-              if(typeof req.body.tag=='object'){
-                 mas=req.body.tag.map(tag => {
+              if(typeof req.body.tags=='object'){
+                 mas=req.body.tags.map(tag => {
                   return [tag, article.insertId]
                 });
               }
               else{
-                mas=[[req.body.tag, article.insertId]];
+                mas=[[req.body.tags, article.insertId]];
               }
               connection.query(
                 'INSERT INTO `TagArticle`(`idTag`, `idArticle`) VALUES ?',[mas],
@@ -155,7 +234,6 @@ router.post('/newarticles', upload.single('img'), function(req, res, next) {
 });
 
 router.get('/articles/:id', function(req, res, next) {
-  console.log(req.params);
   connection.query(
     `SELECT Article.idArticle, Article.name, content, Article.date, Article.img, User.login, Theme.name as themeName, Subject.name as subjectName FROM Article
 inner join User on User.idUser=Article.idUser
@@ -166,11 +244,38 @@ where idArticle=`+req.params.id,
 
       connection.query(
         `SELECT name FROM TagArticle
-inner join Tag on TagArticle.idTag=Tag.idTag
-where TagArticle.idArticle=`+req.params.id,
+        inner join Tag on TagArticle.idTag=Tag.idTag
+        where TagArticle.idArticle=`+req.params.id,
         function(err, tags) {
-          console.log(tags);
-          res.render('article', {article: article[0], tags: tags});
+
+          if(req.query.comment){
+            connection.query(
+              'INSERT INTO Comment(content, idArticle, idUser) VALUES ("'+req.query.comment+'", '+req.params.id+','+req.session.idUser+')',
+              function(err) {
+                connection.query(
+                  `SELECT content, Comment.date, User.login FROM Comment
+                  inner join User on User.idUser=Comment.idUser
+                  WHERE idArticle=`+req.params.id,
+                  function(err, comments) {
+                    res.render('article', {article: article[0], tags: tags, comments: comments});
+                  }
+                );
+              }
+            );
+            return;
+          }
+
+
+
+          connection.query(
+            `SELECT content, Comment.date, User.login FROM Comment
+            inner join User on User.idUser=Comment.idUser
+            WHERE idArticle=`+req.params.id,
+            function(err, comments) {
+              res.render('article', {article: article[0], tags: tags, comments: comments});
+            }
+          );
+
         }
       );
 
