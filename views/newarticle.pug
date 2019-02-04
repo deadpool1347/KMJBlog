@@ -11,7 +11,7 @@ block content
       if error
         .alert.alert-danger(role='alert') #{error}
       br
-      form(name="newarticle", action="/newarticles/"+query ? query.idArticle , method="post", enctype="multipart/form-data")
+      form(name="newarticle", action="/newarticles/"+query ? query.idArticle:'' , method="post", enctype="multipart/form-data")
         select#subject.custom-select.mr-sm-2(name="idSubject", onchange="handleSubject()")
           option(value='') Выбирите предмет
           each subject in subjects
@@ -30,7 +30,7 @@ block content
         input.form-control(value=query ? query.name : '', name="name", type='text', placeholder='Название статьи', aria-label='Articlename', aria-describedby='addon-wrapping')
   
         br
-        p Содержимое
+        p Содержание
         textarea.form-control(name='content', rows='15', placeholder='Содержание') #{query ? query.content : ''}
         br
         .form-row.align-items-center

@@ -145,7 +145,7 @@ where idArticle=`+req.params.id,
                     connection.query(
                       'SELECT * FROM Theme where idSubject = ' + article[0].idSubject,
                       function(err, themes) {
-                        res.render('newarticle',{title: 'Изменение статьи', subjects: subjects, query: { ...article[0], tags: newtags }, tags: tags, themes: themes});
+                        res.render('newarticle',{title: 'Редактирование статьи', subjects: subjects, query: { ...article[0], tags: newtags }, tags: tags, themes: themes});
                       }
                     );
                   }
