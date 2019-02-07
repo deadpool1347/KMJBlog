@@ -12,34 +12,78 @@ html
     script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/i18n/defaults-*.min.js')
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js')
-  
-    nav.navbar.navbar-expand-lg.navbar-light.bg-light
-      a.navbar-brand(href='/') Главная страница
-      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
-        span.navbar-toggler-icon
-      #navbarSupportedContent.collapse.navbar-collapse
-        ul.navbar-nav.mr-auto
-          li.nav-item.active
-            a.nav-link(href='/articles')
-              | Статьи
-              span.sr-only (current)
-          li.nav-item
-            a.nav-link(href='/user') Личный кабинет
-        
-          if session && session.email
-            span.nav-link #{session.email}
-            form.form-inline.my-2.my-lg-0(name="logout", action="/logout", method="get", enctype="application/x-www-form-urlencoded")
-              button.btn.btn-outline-success(type='submit') Выйти    
-          else 
-            a.btn.btn-outline-success(href="/login") Войти 
-    
-          if session && session.idStatus
-            a.btn.btn-outline-info.btn-newarticles(href="/newarticles/0") Добавить статью
-
+    .alert.alert-secondary
+      nav.navbar.navbar-expand-lg.navbar-light.bg-light
+        a.navbar-brand(href='/') Главная страница
+        button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+          span.navbar-toggler-icon
+        #navbarSupportedContent.collapse.navbar-collapse
+          ul.navbar-nav.mr-auto
+            li.nav-item.active
+              a.nav-link(href='/articles')
+                | Статьи
+                span.sr-only (current)
+            li.nav-item
+              a.nav-link(href='/user') Личный кабинет
           
-    br
-    br
+            if session && session.email
+              span.nav-link #{session.email}
+              form.form-inline.my-2.my-lg-0(name="logout", action="/logout", method="get", enctype="application/x-www-form-urlencoded")
+                button.btn.btn-outline-success(type='submit') Выйти    
+            else 
+              a.btn.btn-outline-success(href="/login") Войти 
+      
+            if session && session.idStatus
+              a.btn.btn-outline-info.btn-newarticles(href="/newarticles/0") Добавить статью
+
     br
   body
     .container-fluid
       block content
+  footer.page-footer.font-small.blue.pt-4
+    br
+    br
+    br
+    br
+    br
+    br
+    .alert.alert-info
+      .container-fluid.text-center.text-md-left
+        .row
+          .col-md-2.mt-md-0.mt-0
+          .col-md-3.mt-md-0.mt-0
+            h5.text-uppercase Сообщество
+            ul.list-unstyled
+              li
+                a(href='/') Блог
+              li
+                a(href='/') Вконтакте
+              li
+                a(href='#!') Фейсбук
+
+          hr.clearfix.w-100.d-md-none.pb-3
+          .col-md-3.mb-md-0.mb-3
+            h5.text-uppercase Обучение
+            ul.list-unstyled
+              li
+                a(href='') Каталог статей
+              li
+                a(href='/') Блог
+              li
+                a(href='#!') Консультация
+
+          .col-md-3.mb-md-0.mb-3
+            h5.text-uppercase О проекте
+            ul.list-unstyled
+              li
+                a(href='#!') Условие пользования
+              li
+                a(href='#!') Контакты
+              li
+                a(href='#!') Авторы
+
+      .footer-copyright.text-center.py-3
+        | &copy; 2019 Блог школы математики и информатики:
+        a(href='/')  KmgBlog.com
+
+         

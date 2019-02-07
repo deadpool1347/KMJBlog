@@ -1,36 +1,35 @@
 extends layout
 
 block content
+  .alert.alert-secondary
+    h1.text-center= title
 
-  h1.text-center= title
-
-  br
   br
   .container
-    .alert.alert-info
+    .alert.alert-info(height=35)
       if error
         .alert.alert-danger(role='alert') #{error}
       br
       form(name="newarticle", action="/newarticles/"+query ? query.idArticle:'' , method="post", enctype="multipart/form-data")
         select#subject.custom-select.mr-sm-2(name="idSubject", onchange="handleSubject()")
-          option(value='') Выбирите предмет
+          option(value='') Выбирите предмет*
           each subject in subjects
             option(value=subject.idSubject, selected=query && query.idSubject==subject.idSubject) #{subject.name}
         br
         br
         - console.log(tags) 
         select#theme.custom-select.mr-sm-2(value=query ? query.idTheme : '', name="idTheme")
-          option(value='') Выбирите тему
+          option(value='') Выбирите тему*
           if themes 
             each theme in themes
               option(value=theme.idTheme, selected=query && query.idTheme==theme.idTheme) #{theme.name}
         br
         br
-        p Название статьи
+        p Название статьи*
         input.form-control(value=query ? query.name : '', name="name", type='text', placeholder='Название статьи', aria-label='Articlename', aria-describedby='addon-wrapping')
   
         br
-        p Содержание
+        p Содержание*
         textarea.form-control(name='content', rows='15', placeholder='Содержание') #{query ? query.content : ''}
         br
         .form-row.align-items-center

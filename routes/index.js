@@ -39,7 +39,7 @@ router.get('/', function(req, res, next) {
     'SELECT * FROM Subject',
     function(err, subjects) {
       var where = '';
-      var join = 'left join ArticleLike on ArticleLike.idArticle=Article.idArticle';
+      var join = '';
       if (req.query.theme) {
         where += `${!where ? 'where':' and'} idTheme=${req.query.theme}`
       }
@@ -53,28 +53,55 @@ router.get('/', function(req, res, next) {
         join+= ` inner join User on Article.idUser=User.idUser`
       }
 
+      console.log(`SELECT COUNT(Article.idArticle) as count FROM Article  ${join} ${where}`);
+
+
+
       connection.query(
-        `SELECT Article.idArticle, name, content, date, img,
-        sum(case when likes=1 then 1 end) as likes,
-        sum(case when likes=0 then 1 end) as dislikes
-        FROM Article ${join} ${where}
-        GROUP by Article.idArticle` ,
-        function(err, articles) {
-          var newArticlas = articles.map(article => {
-            return { ...article, content: article.content.slice(0, 400)+'...' }
-          })
+        `SELECT COUNT(Article.idArticle) as count FROM Article  ${join} ${where}`,
+        function(err, count) {
 
-          if(req.query.subject){
-            connection.query(
-              'SELECT * FROM Theme where idSubject = ' + req.query.subject,
-              function(err, themes) {
-                res.render('index', {title: 'KMJ School', articles: newArticlas, query:req.query, subjects: subjects, session: req.session, themes: themes});
-              }
-            );
-            return;
+          console.log(count);
+          var limit = 3;
+          var pageNumber = Math.ceil(count[0].count/limit);
+          var pages = [];
+          for(var i=0; i<pageNumber; i++)
+            pages.push(i+1);
+          var offset = limit * (req.query.activePage ? req.query.activePage-1 : 0);
+
+          var pagi = {
+            pages:pages,
+            activePage: req.query.activePage||1
           }
+          join+=` left join ArticleLike on ArticleLike.idArticle=Article.idArticle`;
 
-          res.render('index', {title: 'KMJ School', articles: newArticlas, query:req.query, subjects: subjects, session: req.session});
+          connection.query(
+            `SELECT Article.idArticle, name, content, Article.date, img,
+            sum(case when likes=1 then 1 end) as likes,
+            sum(case when likes=0 then 1 end) as dislikes
+            FROM Article ${join} ${where}
+            GROUP by Article.idArticle
+            limit ${limit}
+            offset ${offset}` ,
+            function(err, articles) {
+              var newArticlas = articles.map(article => {
+                return { ...article, content: article.content.slice(0, 400)+'...' }
+              })
+
+              if(req.query.subject){
+                connection.query(
+                  'SELECT * FROM Theme where idSubject = ' + req.query.subject,
+                  function(err, themes) {
+
+                    res.render('index', {title: 'KMJ School',pagi: pagi, articles: newArticlas, query:req.query, subjects: subjects, session: req.session, themes: themes});
+                  }
+                );
+                return;
+              }
+
+              res.render('index', {title: 'KMJ School',pagi: pagi, articles: newArticlas, query:req.query, subjects: subjects, session: req.session});
+            }
+          );
         }
       );
     }

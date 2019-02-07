@@ -3,15 +3,16 @@ extends layout
 block content
   .container
     .row
-      .col-6
-       h1.text-center Регистрация
+      .col-6  
+       h1.alert.alert-secondary.text-center Регистрация
+       br
        .alert.alert-info
         .col-12
           if error
             .alert.alert-danger(role='alert') #{error}
           form(name="registration", action="/registration", method="get", enctype="application/x-www-form-urlencoded")
             .form-group.row
-              label.col-sm-2.col-form-label(for='inputEmail3') Email
+              label.col-sm-2.col-form-label(for='inputEmail3') Email*
               .col-sm-10
                 .input-group
                   .input-group-prepend
@@ -19,11 +20,11 @@ block content
                       span.oi.oi-envelope-closed
                   input#inputEmail3.form-control(name="email", type='email', placeholder='Email', value=query ? query.email : '')
             .form-group.row
-              label.col-sm-2.col-form-label(for='inputPassword3') Пароль
+              label.col-sm-2.col-form-label(for='inputPassword3') Пароль*
               .col-sm-10
                   input.form-control(name="password1", type='password', placeholder='Пароль',  value=query ? query.password1 : '')
             .form-group.row
-              label.col-sm-2.col-form-label(for='inputPassword3') Повторите пароль
+              label.col-sm-2.col-form-label(for='inputPassword3') Повторите пароль*
               .col-sm-10
                   input.form-control(name="password2", type='password', placeholder='Повторите пароль',  value=query ? query.password2 : '')
             p Уже есть аккаунт? &nbsp

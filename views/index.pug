@@ -1,14 +1,15 @@
 extends layout
 
 block content
-  h1= title
+  .alert.alert-secondary
+    h1= title
   p Блог школы математики и информатики
   .container
+    -console.log(query)
   .row
     .col-3
      .alert.alert-info
       h2.text-center Поиск
-
       br
       form(name="filter", action="/", method="get", enctype="application/x-www-form-urlencoded")
         select#subject.custom-select.mr-sm-2(name="subject", onchange="handleSubject()")
@@ -41,13 +42,19 @@ block content
                p.card-text #{article.content}
                a.btn.btn-primary(href='/articles/'+article.idArticle) Подробнее
                br
-               br
-                 
-                 
+               br 
                span.oi.oi-thumb-up(id='like'+article.idArticle, class='glyphicon glyphicon-thumbs-up ', style='font-size: 200%; margin-right: 20px;' onclick='handleLike(this, 1,'+article.idArticle+')') #{article.likes || 0}
                span.oi.oi-thumb-down(id='dislike'+article.idArticle, class='glyphicon glyphicon-thumbs-down ', style='font-size: 200%' onclick='handleLike(this, 0,'+article.idArticle+')') #{article.dislikes || 0}
-          
+        
           br 
+      - var url = 'http://localhost:3000/?subject=' + (query.subject ? query.subject : '') + '&theme='+(query.theme ? query.theme : '') +'&author='+(query.author ? query.author : '')+'&article'+(query.article ? query.article : '')
+      - console.log(url)
+      ul.pagination.pagination-lg
+        each page in pagi.pages
+          li.page-item(class = pagi.activePage == page ? 'disabled':'')
+            a.page-link(href=url+'&activePage='+page) #{page}
+      
+
 
   script(type='text/javascript').
    var handleSubject = function(){
