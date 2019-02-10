@@ -6,9 +6,6 @@ var api_key = 'key-2f09c76695a377a13554a4f01e97d874';
 var DOMAIN = 'mg.kazakovmj.ru';
 var mailgun = require('mailgun-js')({apiKey: api_key, domain: DOMAIN});
 var multer  = require('multer')
-
-
-
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, '../public/images'))
@@ -52,15 +49,10 @@ router.get('/', function(req, res, next) {
         where += `${!where ? 'where':' and'} login like "%${req.query.author}%"`
         join+= ` inner join User on Article.idUser=User.idUser`
       }
-
       console.log(`SELECT COUNT(Article.idArticle) as count FROM Article  ${join} ${where}`);
-
-
-
       connection.query(
         `SELECT COUNT(Article.idArticle) as count FROM Article  ${join} ${where}`,
         function(err, count) {
-
           console.log(count);
           var limit = 3;
           var pageNumber = Math.ceil(count[0].count/limit);
@@ -74,7 +66,6 @@ router.get('/', function(req, res, next) {
             activePage: req.query.activePage||1
           }
           join+=` left join ArticleLike on ArticleLike.idArticle=Article.idArticle`;
-
           connection.query(
             `SELECT Article.idArticle, name, content, Article.date, img,
             sum(case when likes=1 then 1 end) as likes,
@@ -335,7 +326,7 @@ router.get('/registration', function(req, res, next) {
       }
       var key = Math.floor(Math.random() * 1000000000) + 1;
       connection.query(
-        'insert into User (login, password, idStatus, keyCode) values("'+req.query.email+'", '+req.query.password1+', 1, '+key+' )',
+        'insert into User (login, password, idStatus, keyCode, nickname) values("'+req.query.email+'", '+req.query.password1+', 1, '+key+',"'+req.query.nickname+'" )',
         function(err, result) {
           var data = {
             from: 'KMJ School <me@samples.mailgun.org>',

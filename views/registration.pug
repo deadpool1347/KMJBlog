@@ -27,6 +27,11 @@ block content
               label.col-sm-2.col-form-label(for='inputPassword3') Повторите пароль*
               .col-sm-10
                   input.form-control(name="password2", type='password', placeholder='Повторите пароль',  value=query ? query.password2 : '')
+            .form-group.row
+              label.col-sm-2.col-form-label(for='password2') Введите ник *
+              .col-sm-10
+                input.form-control(name="nickname", type='password', placeholder='Никнайм',  value=query ? query.nickname : '')
+                
             p Уже есть аккаунт? &nbsp
              a(href="/login") Войти
             .form-group.row

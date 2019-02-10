@@ -1,6 +1,7 @@
 extends layout
 
-block content
+block content 
+
   .alert.alert-secondary
     h1.alert.alert-secondary.text-center= article.name
   br
@@ -32,7 +33,7 @@ block content
         .row
           .col-sm
             h4  #{comment.login}
-            h4 #{comment.date}
+            h4 #{getReadableDate(comment.date, 1)}
           .col-sm
             p  #{comment.content}
         hr
