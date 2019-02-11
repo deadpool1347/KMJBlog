@@ -19,7 +19,8 @@ var upload = multer({ dest: 'uploads/', storage: storage })
 
 var connection = mysql . createConnection ( {
   host: 'localhost' ,
-  user : 'root' ,
+  user : 'Blog' ,
+  password: '9705coolchild',
   database: 'Blog'
 } ) ;
 
@@ -253,7 +254,7 @@ router.post('/newarticles/:id', upload.single('img'), function(req, res, next) {
 
 router.get('/articles/:id', function(req, res, next) {
   connection.query(
-    `SELECT Article.idArticle, Article.name, content, Article.date, Article.img, User.login, Theme.name as themeName, Subject.name as subjectName FROM Article
+    `SELECT Article.idArticle, Article.name, content, Article.date, Article.img, User.nickname, Theme.name as themeName, Subject.name as subjectName FROM Article
 inner join User on User.idUser=Article.idUser
 inner join Theme on Theme.idTheme=Article.idTheme
 inner join Subject on Theme.idSubject=Subject.idSubject
@@ -271,7 +272,7 @@ where idArticle=`+req.params.id,
               'INSERT INTO Comment(content, idArticle, idUser) VALUES ("'+req.query.comment+'", '+req.params.id+','+req.session.idUser+')',
               function(err) {
                 connection.query(
-                  `SELECT content, Comment.date, User.login FROM Comment
+                  `SELECT content, Comment.date, User.nickname FROM Comment
                   inner join User on User.idUser=Comment.idUser
                   WHERE idArticle=`+req.params.id,
                   function(err, comments) {
@@ -286,7 +287,7 @@ where idArticle=`+req.params.id,
 
 
           connection.query(
-            `SELECT content, Comment.date, User.login FROM Comment
+            `SELECT content, Comment.date, User.nickname FROM Comment
             inner join User on User.idUser=Comment.idUser
             WHERE idArticle=`+req.params.id,
             function(err, comments) {
@@ -307,7 +308,6 @@ router.get('/registration', function(req, res, next) {
     res.render('registration');
     return;
   }
-
   var error;
 
   if(req.query.password1!==req.query.password2){
@@ -315,15 +315,16 @@ router.get('/registration', function(req, res, next) {
     res.render('registration', {query: req.query, error: error});
     return;
   }
-
+  console.log(req.query);
   connection.query(
-    'SELECT * FROM Users where login='+req.query.email,
+    'SELECT * FROM Users where login='+req.query.email+'and nickname='+req.query.nickname,
     function(err, user) {
       if(user){
         error='Такой login уже существует!';
         res.render('registration', {query: req.query, error: error});
         return;
       }
+
       var key = Math.floor(Math.random() * 1000000000) + 1;
       connection.query(
         'insert into User (login, password, idStatus, keyCode, nickname) values("'+req.query.email+'", '+req.query.password1+', 1, '+key+',"'+req.query.nickname+'" )',
@@ -412,7 +413,9 @@ router.get('/user', function(req, res, next) {
     res.redirect('/login');
   }
   connection.query(
-    'SELECT * FROM UserInfo where idUser='+req.session.idUser,
+    `SELECT * FROM UserInfo
+inner join User on UserInfo.idUser=User.idUser
+where User.idUser=`+req.session.idUser,
     function(err, user) {
 
       if (req.query && req.query.password1){

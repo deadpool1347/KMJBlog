@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Фев 10 2019 г., 17:44
+-- Время создания: Фев 11 2019 г., 16:11
 -- Версия сервера: 5.6.38
 -- Версия PHP: 5.5.38
 
@@ -52,7 +52,10 @@ INSERT INTO `Article` (`idArticle`, `name`, `content`, `date`, `idUser`, `idThem
 (22, 'Вашкевич М.А.', 'dfgfdgfhj', '2019-01-21 09:56:55', 20, 1, 'img-1548064615860.jpg'),
 (23, 'htththth', 'hrthrthdtht', '2019-01-22 09:28:28', 20, 1, 'img-1548149308032.jpg'),
 (24, 'Вашкевич М.А.', 'eknjbhvgcwvhbjkl;2kjbhvgcvjkl;kjhbvgcfxfhjkl;v bjkljhvc', '2019-01-22 09:30:53', 20, 1, ''),
-(25, 'tag123456789098765432345678', '1234567u8i9i87654323456y7uiu7654ewaxc ', '2019-01-22 10:23:12', 20, 4, 'undefined');
+(25, 'tag123456789098765432345678', '1234567u8i9i87654323456y7uiu7654ewaxc ', '2019-01-22 10:23:12', 20, 4, 'undefined'),
+(26, '55555111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111121111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111', '12345678555551111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111211111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111112', '2019-02-11 09:45:30', 20, 1, ''),
+(27, 'test undefined', '555551111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111211111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111112555551111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111211111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111112555551111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111211111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111112', '2019-02-11 09:51:17', 20, 1, 'img-1549878677104.jpg'),
+(28, '44', 'uihjkk', '2019-02-11 09:52:29', 20, 1, '');
 
 -- --------------------------------------------------------
 
@@ -103,12 +106,20 @@ CREATE TABLE `Comment` (
 --
 
 INSERT INTO `Comment` (`idComment`, `content`, `date`, `idArticle`, `idUser`) VALUES
-(1, 'Коментарии………...', '2018-12-31 21:00:00', 2, 5),
-(3, 'КОментарий2', '2018-12-31 21:00:00', 2, 6),
-(4, 'hello', '0000-00-00 00:00:00', 2, 20),
-(5, 'hello', '0000-00-00 00:00:00', 2, 20),
-(6, 'rgfedwsa', '2019-01-25 10:58:19', 1, 20),
-(7, 'wcsqvhabnmkjwbn ', '2019-01-25 10:58:32', 1, 20);
+(8, 'Hello', '2019-02-11 10:30:48', 2, 20),
+(9, 'What?', '2019-02-11 10:31:31', 2, 20),
+(10, 'gfvb', '2019-02-11 10:32:24', 2, 20),
+(11, 'gfv', '2019-02-11 10:57:11', 2, 20);
+
+--
+-- Триггеры `Comment`
+--
+DELIMITER $$
+CREATE TRIGGER `addComment` BEFORE INSERT ON `Comment` FOR EACH ROW if (select count(*) from Comment where content = NEW.content and idUser = NEW.idUser and idArticle = NEW.idArticle) > 0 then 
+SIGNAL SQLSTATE '45000';
+end if
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -269,13 +280,24 @@ CREATE TABLE `User` (
 --
 
 INSERT INTO `User` (`idUser`, `login`, `nickname`, `password`, `date`, `idStatus`, `keyCode`) VALUES
-(5, 'nkh@bdje.ru', '', 'ycgew', '2018-12-09 21:00:00', 1, 0),
-(6, 'urhfe@eyru.ru', '', 'gfyeh', '2018-12-29 21:00:00', 2, 0),
-(9, 'name', '', 'pswd', '0000-00-00 00:00:00', 2, 567833),
-(11, 'p_m.a.vashkevich@mpt.ru', '', '1', '2019-01-10 12:03:37', 1, 543878568),
-(20, 'fuurria@yandex.ru', '', '2', '2019-01-14 10:38:24', 3, 396681638),
+(5, 'nkh@bdje.ru', 'test', 'ycgew', '2018-12-09 21:00:00', 1, 0),
+(20, 'fuurria@yandex.ru', 'deeee', '2', '2019-01-14 10:38:24', 3, 396681638),
 (21, 'test@yandex.ru', 'test', '12', '2019-02-10 11:26:25', 1, 964180904),
-(22, 'test@yandex.ru', 'test', '12', '2019-02-10 12:01:50', 1, 379080332);
+(22, 'test@yandex.ru', 'test', '12', '2019-02-10 12:01:50', 1, 379080332),
+(23, 'h@bdje.ru', 'testsss', '123', '2019-02-11 10:43:18', 1, 5456789),
+(24, 'v-lexa@yandex.ru', 'father', '123', '2019-02-11 10:45:32', 1, 454087522),
+(25, 'n@bdje.ru', 'tesss', '1234', '2019-02-11 10:48:13', 1, 34567654),
+(26, 'test@bdje.ru', 'ty', '1', '2019-02-11 12:35:22', 1, 757989639);
+
+--
+-- Триггеры `User`
+--
+DELIMITER $$
+CREATE TRIGGER `addUser` BEFORE INSERT ON `User` FOR EACH ROW if NEW.login in (select login from User) then 
+SIGNAL SQLSTATE '45000';
+end if
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -295,8 +317,7 @@ CREATE TABLE `UserInfo` (
 --
 
 INSERT INTO `UserInfo` (`idUser`, `name`, `vk`, `facebook`) VALUES
-(5, 'ник1', 'url vk1', 'url facebook1'),
-(6, 'ник2', 'url vk 2', 'url facebook 2');
+(5, 'ник1', 'url vk1', 'url facebook1');
 
 -- --------------------------------------------------------
 
@@ -416,7 +437,7 @@ ALTER TABLE `Video`
 -- AUTO_INCREMENT для таблицы `Article`
 --
 ALTER TABLE `Article`
-  MODIFY `idArticle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `idArticle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT для таблицы `ArticleLike`
@@ -428,7 +449,7 @@ ALTER TABLE `ArticleLike`
 -- AUTO_INCREMENT для таблицы `Comment`
 --
 ALTER TABLE `Comment`
-  MODIFY `idComment` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `idComment` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `Status`
@@ -470,7 +491,7 @@ ALTER TABLE `Training`
 -- AUTO_INCREMENT для таблицы `User`
 --
 ALTER TABLE `User`
-  MODIFY `idUser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `idUser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT для таблицы `Video`

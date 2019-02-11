@@ -1,7 +1,6 @@
 extends layout
 
-block content 
-
+block content
   .alert.alert-secondary
     h1.alert.alert-secondary.text-center= article.name
   br
@@ -12,8 +11,8 @@ block content
           h4 Предмет #{article.subjectName}
           h4 Тема #{article.themeName}
         .col-sm
-          h4 Автор #{article.login}
-          h4 Дата: #{article.date}
+          h4 Автор #{article.nickname}
+          h4 Дата: #{""+(article.date.getDate()<10?"0":"")+article.date.getDate() +"."+(article.date.getMonth()<9?"0":"")+(article.date.getMonth()+1)+"."+(article.date.getFullYear())+" "+article.date.getHours()+":"+article.date.getMinutes()}
       br
       .text-center
         img.rounded(width='100%', src='/images/'+article.img, alt='...')
@@ -32,8 +31,9 @@ block content
       each comment in comments
         .row
           .col-sm
-            h4  #{comment.login}
-            h4 #{getReadableDate(comment.date, 1)}
+            - console.log(comment)
+            h4  #{comment.nickname}
+            h4 #{""+(comment.date.getDate()<10?"0":"")+comment.date.getDate() +"."+(comment.date.getMonth()<9?"0":"")+(comment.date.getMonth()+1)+"."+(comment.date.getFullYear())+" "+comment.date.getHours()+":"+comment.date.getMinutes()}
           .col-sm
             p  #{comment.content}
         hr

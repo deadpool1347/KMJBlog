@@ -64,8 +64,9 @@ block content
       $.ajax({url: "/filter", type: "POST", data: {'subject': id}, success: function(themes){
         $('#theme').empty();
         for(var i=0; i<themes.themes.length;i++)
-        {
-          $('#theme').append("<option value=" + themes.themes[i].idTheme + ">" + themes.themes[i].name + "</option>");
+        {         
+        
+          $('#theme').append("<option value=" + themes.themes[i].idTheme + ">" + themes.themes[i].name  + "</option>");
         }
       }});
     });
